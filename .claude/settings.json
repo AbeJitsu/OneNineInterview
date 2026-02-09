@@ -74,7 +74,7 @@
       "Bash(rm -rf .:*)",
       "Bash(sudo:*)",
       "Read(**/.env*)",
-      "Write(**/.env*)",
+      
       "Edit(**/.env*)",
       "Read(**/secrets.*)",
       "Write(**/secrets.*)",
