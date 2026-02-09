@@ -1,0 +1,52 @@
+# Sample Tasks for Testing
+
+Use these sample tasks to test your Smart Task Manager application. They cover different categories, priorities, and due dates.
+
+## Work Tasks
+Fix bug in authentication module - urgent
+Review Sarah's pull request by end of day
+Prepare presentation for client meeting next Tuesday
+Update API documentation
+Schedule team standup for tomorrow morning
+
+## Personal Tasks
+Call mom this weekend
+Buy groceries for dinner party on Saturday
+Return library books
+Plan summer vacation
+
+## Health Tasks
+Schedule dentist appointment for next Friday
+Go for a run tomorrow morning
+Refill prescription before it runs out
+Book annual physical exam
+
+## Finance Tasks
+Pay electricity bill before the 15th
+Review quarterly investment portfolio
+File expense report from last week's trip
+Research investment options for retirement savings
+
+## Ambiguous/Edge Cases
+Something important I need to do
+buy milk
+URGENT!!!
+Call about the thing
+Meeting
+Write code
+
+## Tasks with Specific Dates
+Submit tax documents by April 15th
+Birthday party on March 22nd at 6pm
+Dentist appointment next Wednesday at 2:30pm
+Project deadline: December 1st
+
+## Complex Tasks
+Organize team offsite including venue booking, catering, and activity planning - needs to be done by end of month
+Research and compare at least 3 different project management tools, create comparison matrix, and present findings to leadership team
+
+## Tasks Without Clear Deadlines
+Learn Spanish
+Get better at cooking
+Read more books
+Exercise regularly
