@@ -5,10 +5,10 @@ This document explains every test in the project: what it checks, why it matters
 ## How to Run
 
 ```bash
-# Unit tests (27 tests, runs in ~1 second)
+# Unit tests (39 tests, runs in ~1 second)
 npm run test:run
 
-# E2E tests (16 tests, runs against a real browser + live AI)
+# E2E tests (20 tests, runs against a real browser + live AI)
 SKIP_WEBSERVER=true npx playwright test e2e/task-analyzer.spec.ts --project=e2e
 
 # Unit tests in watch mode (re-runs on file changes)
@@ -21,8 +21,8 @@ npm run test
 |-------|------|-------|------|----------------|
 | Input Validation | `__tests__/task-validator.test.ts` | 10 | Vitest | Rejects bad input before it reaches the AI |
 | Response Parsing | `__tests__/response-parser.test.ts` | 11 | Vitest | Handles every format Claude might return |
-| Prompt Structure | `__tests__/prompt-builder.test.ts` | 6 | Vitest | Catches broken prompts before they ship |
-| Full User Flow | `e2e/task-analyzer.spec.ts` | 16 | Playwright | Real browser, real AI, real results |
+| Prompt Structure | `__tests__/prompt-builder.test.ts` | 18 | Vitest | Catches broken prompts + validates seasonal date logic |
+| Full User Flow | `e2e/task-analyzer.spec.ts` | 20 | Playwright | Real browser, real AI, real results |
 
 ---
 
@@ -92,6 +92,33 @@ npm run test
 
 **How it works:** Calls `buildSystemPrompt()` and uses string `.toContain()` checks. Simple but catches the most dangerous prompt regressions.
 
+#### 3a. Seasonal Date Parsing (`prompt-builder.test.ts`)
+
+**What this tests:** The `getSeasonalDate` helper function, which converts seasonal references like "end of summer" into specific dates (September 22) with automatic year rollover.
+
+**Why we test it:** Users naturally reference seasons in deadlines ("by end of spring"). Without this, Claude would interpret "end of summer" as August 31st (meteorological) instead of September 22nd (astronomical equinox), which is what people actually mean.
+
+| # | Test | Input | Expected | Why it matters |
+|---|------|-------|----------|----------------|
+| 7 | Returns current year date when before | `('2026-05-15', 9, 22)` | `'2026-09-22'` | May is before September, use this year |
+| 8 | Returns next year when date has passed | `('2026-10-15', 9, 22)` | `'2027-09-22'` | October is after September, roll to next year |
+| 9 | Handles end of spring (June 20) | `('2026-03-01', 6, 20)` | `'2026-06-20'` | Spring equinox date |
+| 10 | Handles spring rollover to next year | `('2026-07-01', 6, 20)` | `'2027-06-20'` | Already past June, use next year |
+| 11 | Handles end of fall (December 21) | `('2026-05-01', 12, 21)` | `'2026-12-21'` | Fall equinox date |
+| 12 | Handles fall rollover to next year | `('2027-01-01', 12, 21)` | `'2027-12-21'` | January comes after December, but use this year's December (not past yet) |
+| 13 | Handles end of winter (March 19) | `('2026-01-01', 3, 19)` | `'2026-03-19'` | Winter end date |
+| 14 | Handles winter rollover to next year | `('2026-04-01', 3, 19)` | `'2027-03-19'` | April is after March, roll to next year |
+| 15 | Handles leap years correctly | `('2024-02-15', 9, 22)` | `'2024-09-22'` | Leap year doesn't affect seasonal dates |
+| 16 | Returns same date when exactly on it | `('2026-09-22', 9, 22)` | `'2026-09-22'` | Boundary case: already on the date |
+
+**Additional prompt tests:**
+| # | Test | What it checks |
+|---|------|----------------|
+| 17 | Prompt includes seasonal parsing rules | Verifies "end of summer", "September 22", "astronomical seasons" in prompt |
+| 18 | Prompt includes seasonal example | Verifies "by end of summer" in few-shot examples |
+
+**How it works:** Calls `getSeasonalDate(today, month, day)` with test dates and verifies the returned ISO date string. The function automatically rolls to next year if `today > seasonalDate`.
+
 ---
 
 ## E2E Tests
@@ -149,11 +176,24 @@ These are the most important tests. Each one submits a real task to Claude and v
 |---|------|-------------|----------------|
 | 15 | Displays correct date without timezone offset | Submits "Submit the report by February 15th 2026", checks for "February 15, 2026" | The app uses EST (server local time) for all date calculations. Without this, `toISOString()` returns UTC — so at 9 PM EST, Claude would think today is already tomorrow, causing every relative date ("tomorrow", "next Friday") to be off by a day. This test catches that. |
 
+#### Seasonal Date Parsing (4 tests)
+
+These tests verify that Claude correctly interprets seasonal references and returns astronomical equinox/solstice dates.
+
+| # | Task submitted | Expected date | What it proves |
+|---|---------------|---------------|----------------|
+| 17 | "remind me to lose 10 pounds by the end of summer" | September 22, 2026 | "end of summer" → autumn equinox (not August 31st) |
+| 18 | "finish project by end of spring" | June 20, 2026 | "end of spring" → summer solstice |
+| 19 | "complete renovation by end of fall" | December 21, 2026 | "end of fall" → winter solstice |
+| 20 | "plan ski trip for start of winter" | December 21, 2026 | "start of winter" → winter solstice |
+
+**How it works:** Same as reliability tests, but specifically validates seasonal date extraction.
+
 #### Error Handling (1 test)
 
 | # | Test | What it does | Why it matters |
 |---|------|-------------|----------------|
-| 16 | Handles API errors gracefully | Intercepts `/api/analyze-task` with a mocked 500 response, submits a task, checks error message appears | When Claude is down or the API key is wrong, users should see a clear error instead of a blank screen |
+| 21 | Handles API errors gracefully | Intercepts `/api/analyze-task` with a mocked 500 response, submits a task, checks error message appears | When Claude is down or the API key is wrong, users should see a clear error instead of a blank screen |
 
 **How the mock works:** Playwright's `page.route()` intercepts the network request and returns a fake 500 error before it ever reaches the server. This tests the UI's error handling without depending on a real failure.
 

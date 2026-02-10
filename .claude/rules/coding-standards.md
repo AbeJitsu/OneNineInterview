@@ -57,7 +57,60 @@ const productFormatted = `$${productDollars.toFixed(2)}`;
 // ... then doing it all again for cart total
 ```
 
-## Write for Humans (Clear Comments)
+## File Header Comments (Required for Every File)
+
+Every file must start with a comment block that explains what the file does, why it exists, and how it works. This helps anyone—even non-developers—understand the file's purpose at a glance.
+
+**Required format:**
+
+```typescript
+// ============================================
+// [FILE PURPOSE IN ALL CAPS]
+// What: [One sentence describing what this file does]
+// Why: [One sentence explaining why this file exists or why it matters]
+// How: [How it works - required; short phrase if simple, detailed if complex]
+// ============================================
+```
+
+**Examples:**
+
+```typescript
+// ============================================
+// SYSTEM PROMPT BUILDER
+// What: Constructs the system prompt that tells Claude how to categorize tasks
+// Why: Prompt quality directly controls categorization accuracy
+// How: Injects today's date for relative date math, includes few-shot examples
+//      with computed dates, and defines strict JSON output format
+// ============================================
+```
+
+```typescript
+// ============================================
+// TASK ANALYZER E2E TESTS
+// What: Tests the full flow: submit task → AI analysis → display results
+// Why: Validates reliability of categorization, priority, and date extraction
+// How: Uses Playwright to simulate real browser interactions with live AI calls
+// ============================================
+```
+
+```typescript
+// ============================================
+// INPUT VALIDATOR
+// What: Validates user task input before sending to AI
+// Why: Prevents bad data from wasting API calls
+// How: Checks string length (3-500 chars) and returns error messages
+// ============================================
+```
+
+**Rules:**
+- Every `.ts`, `.tsx`, `.js`, `.jsx` file must have this header
+- All three lines (What/Why/How) are **required** for consistency
+- Keep each line under 80 characters
+- Use active voice ("Constructs", "Tests", "Handles")
+- The "How" line can be short if the implementation is simple (e.g., "Exports utility functions") or detailed if complex (e.g., multi-line explanation)
+- Update the header when the file's purpose changes
+
+## Write for Humans (Clear Comments for Code Sections)
 
 Comments should explain what's happening and why, using everyday language. Imagine explaining the code to someone who's never programmed before.
 
@@ -95,12 +148,19 @@ const addItem = async (variantId: string, quantity: number) => {
 };
 ```
 
-**Guidelines for comments:**
+**Guidelines for section comments:**
 
 - Use plain language anyone can understand
 - Explain the "why" not just the "what"
-- Use section dividers (=====) to break up different parts
+- **Use section dividers (`// ============`) to break up major code sections** (50+ lines)
+- Add 1-2 line comments above complex logic blocks
 - If someone without coding experience reads it, they should get the general idea
+- For major sections (authentication flow, data processing, etc.), add a 2-3 line explanation
+
+**When to add section dividers:**
+- Separating different logical areas (e.g., "State Management" vs "API Calls" vs "Helper Functions")
+- Before a group of related functions (e.g., "Date calculation helpers")
+- When switching between different concerns in a single file
 
 ## File Organization
 
