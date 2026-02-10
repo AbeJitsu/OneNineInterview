@@ -190,3 +190,4 @@ npx vercel
 - Calendar integration (sync due dates)
 - Confidence scores per categorization
 - OpenAI GPT fallback for redundancy
+# Vercel config test
