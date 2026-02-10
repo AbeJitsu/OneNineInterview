@@ -180,6 +180,55 @@ test.describe('Task Analyzer - Date Display Accuracy', () => {
   });
 });
 
+test.describe('Task Analyzer - Seasonal Date Parsing', () => {
+  test('should parse "end of summer" as September 22', async ({ page }) => {
+    await page.goto('/');
+
+    // Fill in the task with seasonal reference
+    await page.locator('#task').fill('remind me to lose 10 pounds by the end of summer');
+    await page.getByRole('button', { name: 'Analyze Task' }).click();
+
+    // Wait for results to appear (AI response can take a few seconds)
+    await expect(page.getByText('Analysis Results')).toBeVisible({ timeout: 15000 });
+
+    // Verify category
+    await expect(page.getByText('Health')).toBeVisible();
+
+    // Verify due date is shown and contains September
+    await expect(page.locator('text=/September.*22.*2026/')).toBeVisible();
+  });
+
+  test('should parse "end of spring" as June 20', async ({ page }) => {
+    await page.goto('/');
+
+    await page.locator('#task').fill('finish project by end of spring');
+    await page.getByRole('button', { name: 'Analyze Task' }).click();
+
+    await expect(page.getByText('Analysis Results')).toBeVisible({ timeout: 15000 });
+    await expect(page.locator('text=/June.*20.*2026/')).toBeVisible();
+  });
+
+  test('should parse "by end of fall" as December 21', async ({ page }) => {
+    await page.goto('/');
+
+    await page.locator('#task').fill('complete renovation by end of fall');
+    await page.getByRole('button', { name: 'Analyze Task' }).click();
+
+    await expect(page.getByText('Analysis Results')).toBeVisible({ timeout: 15000 });
+    await expect(page.locator('text=/December.*21.*2026/')).toBeVisible();
+  });
+
+  test('should parse "start of winter" as December 21', async ({ page }) => {
+    await page.goto('/');
+
+    await page.locator('#task').fill('plan ski trip for start of winter');
+    await page.getByRole('button', { name: 'Analyze Task' }).click();
+
+    await expect(page.getByText('Analysis Results')).toBeVisible({ timeout: 15000 });
+    await expect(page.locator('text=/December.*21.*2026/')).toBeVisible();
+  });
+});
+
 test.describe('Task Analyzer - Error Handling', () => {
   test('should handle API errors gracefully', async ({ page }) => {
     // Intercept the API and force a 500 error

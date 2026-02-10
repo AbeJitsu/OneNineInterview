@@ -51,6 +51,15 @@ Parse natural language dates and return ISO format (YYYY-MM-DD) or null if no da
   - "before the 15th" → the 14th (day prior, exclusive deadline)
   - "by the 15th" → the 15th (inclusive deadline)
   - "on the 15th" → the 15th (exact date)
+- Seasonal references (astronomical seasons, auto-rolls to next year if already past):
+  - "end of spring" → June 20
+  - "end of summer" → September 22
+  - "end of fall" / "end of autumn" → December 21
+  - "end of winter" → March 19
+  - "start of spring" → March 20
+  - "start of summer" → June 21
+  - "start of fall" / "start of autumn" → September 23
+  - "start of winter" → December 21
 - Return null if no date is mentioned or the date is too vague
 
 # Response Format
@@ -76,6 +85,9 @@ Response: {"category": "Health", "priority": "Medium", "reasoning": "Medical app
 
 Task: "Pay electricity bill before the 15th"
 Response: {"category": "Finance", "priority": "High", "reasoning": "Bill payment with deadline approaching — 'before the 15th' means the 14th", "due_date": "${getThisMonthDate(today, 14)}"}
+
+Task: "Prepare for hiking trip by end of summer"
+Response: {"category": "Personal", "priority": "Medium", "reasoning": "Personal goal with seasonal deadline — end of summer is September 22nd (astronomical equinox)", "due_date": "${getSeasonalDate(today, 9, 22)}"}
 
 Task: "URGENT!!!"
 Response: {"category": "Other", "priority": "High", "reasoning": "Ambiguous task with urgency marker but no clear context", "due_date": null}`;
@@ -103,6 +115,27 @@ function getThisMonthDate(today: string, dayOfMonth: number): string {
   const date = new Date(today + 'T00:00:00');
   date.setDate(dayOfMonth);
   return toLocalDateString(date);
+}
+
+/**
+ * Get seasonal date with automatic year rollover
+ * Uses astronomical seasons (equinoxes and solstices)
+ * @param today - Current date in YYYY-MM-DD format
+ * @param month - Target month (1-12)
+ * @param day - Target day
+ * @returns ISO date string (YYYY-MM-DD)
+ */
+export function getSeasonalDate(today: string, month: number, day: number): string {
+  const currentDate = new Date(today + 'T00:00:00');
+  const year = currentDate.getFullYear();
+  const seasonalDate = new Date(year, month - 1, day); // month-1 because Date uses 0-indexed months
+
+  // If already past this year's date, use next year
+  if (currentDate > seasonalDate) {
+    seasonalDate.setFullYear(year + 1);
+  }
+
+  return toLocalDateString(seasonalDate);
 }
 
 // Few-shot examples for better categorization
