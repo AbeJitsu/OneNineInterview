@@ -1,0 +1,150 @@
+/* ============================================
+   GLOBAL STYLES
+   What: Design tokens (colors, shadows, fonts) and reusable component classes
+   Why: Centralizes the OneNine brand palette and elegant card/button/input styles
+   How: Tailwind @theme for tokens, @layer components for reusable classes
+   ============================================ */
+
+@import "tailwindcss";
+
+@theme {
+  --color-primary-50: #f4f6f9;
+  --color-primary-100: #e9ecf2;
+  --color-primary-200: #c7d0e0;
+  --color-primary-300: #a5b4ce;
+  --color-primary-400: #617daa;
+  --color-primary-500: #1d4586;
+  --color-primary-600: #1a3e79;
+  --color-primary-700: #163465;
+  --color-primary-800: #112951;
+  --color-primary-900: #0e2242;
+
+  --color-accent-50: #fdfcf9;
+  --color-accent-100: #faf8f3;
+  --color-accent-200: #f3eee1;
+  --color-accent-300: #ebe4cf;
+  --color-accent-400: #dcd0ab;
+  --color-accent-500: #cdbc87;
+  --color-accent-600: #b9a979;
+  --color-accent-700: #9a8d65;
+  --color-accent-800: #7b7151;
+  --color-accent-900: #655d42;
+
+  --color-neutral-50: #fafaf9;
+  --color-neutral-100: #f5f5f4;
+  --color-neutral-200: #e7e5e4;
+  --color-neutral-300: #d6d3d1;
+  --color-neutral-400: #a8a29e;
+  --color-neutral-500: #78716c;
+  --color-neutral-600: #57534e;
+  --color-neutral-700: #44403c;
+  --color-neutral-800: #292524;
+  --color-neutral-900: #1c1917;
+
+  --font-playfair: var(--font-playfair);
+  --font-sans: var(--font-inter);
+  --shadow-elegant: 0 4px 6px -1px rgba(29, 69, 134, 0.1), 0 2px 4px -1px rgba(29, 69, 134, 0.06);
+  --shadow-elegant-lg: 0 10px 15px -3px rgba(29, 69, 134, 0.1), 0 4px 6px -2px rgba(29, 69, 134, 0.05);
+  --shadow-elegant-xl: 0 20px 25px -5px rgba(29, 69, 134, 0.1), 0 10px 10px -5px rgba(29, 69, 134, 0.04);
+}
+
+@layer base {
+  html {
+    @apply antialiased scroll-smooth;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  }
+
+  body {
+    @apply font-sans text-neutral-800 bg-neutral-50;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-playfair);
+  }
+}
+
+@layer utilities {
+  .shadow-elegant {
+    box-shadow: var(--shadow-elegant);
+  }
+
+  .shadow-elegant-lg {
+    box-shadow: var(--shadow-elegant-lg);
+  }
+
+  .shadow-elegant-xl {
+    box-shadow: var(--shadow-elegant-xl);
+  }
+
+  .shadow-inner-elegant {
+    box-shadow: inset 0 2px 4px 0 rgba(29, 69, 134, 0.06);
+  }
+}
+
+@layer components {
+  .elegant-card {
+    border-radius: 1rem;
+    border: 1px solid rgba(214, 211, 209, 0.5);
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(4px);
+    box-shadow: var(--shadow-elegant-lg);
+  }
+
+  .elegant-input {
+    padding: 1rem 1.25rem;
+    border: 2px solid rgb(231, 229, 228);
+    border-radius: 0.75rem;
+    background: rgba(255, 255, 255, 0.5);
+    color: rgb(29, 29, 27);
+    transition: all 0.2s;
+    font-family: var(--font-sans);
+  }
+
+  .elegant-input::placeholder {
+    color: rgb(168, 162, 158);
+  }
+
+  .elegant-input:focus {
+    outline: none;
+    border-color: rgb(165, 180, 206);
+    box-shadow: 0 0 0 4px rgba(165, 180, 206, 0.1);
+  }
+
+  .elegant-button {
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    background: linear-gradient(to right, rgb(26, 62, 121), rgb(22, 52, 101));
+    color: white;
+    transition: all 0.2s;
+    box-shadow: var(--shadow-elegant);
+  }
+
+  .elegant-button:hover {
+    background: linear-gradient(to right, rgb(22, 52, 101), rgb(17, 41, 81));
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-neutral-100;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-neutral-300 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-neutral-400;
+}
+
+/* Selection color */
+::selection {
+  background-color: rgb(199, 208, 224);
+  color: rgb(14, 34, 66);
+}
